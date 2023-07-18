@@ -21,7 +21,7 @@ func (p *Host) Election() error {
 	greaterIds := p.GetGreaterIds()
 	// 如果自己是最大,则直接宣誓主权
 	if len(greaterIds) == 0 {
-		return p.SendVictory(p.Id)
+		return p.SendVictory()
 	}
 
 	// 否则, 对每个比自己大的节点都发送Election消息
@@ -52,7 +52,7 @@ func (p *Host) Election() error {
 	}
 
 	if !rejected {
-		return p.SendVictory(p.Id)
+		return p.SendVictory()
 	}
 
 	return nil
@@ -96,7 +96,7 @@ func (p *Host) AcceptVictory(fromId int32) error {
 	return nil
 }
 
-func (p *Host) SendVictory(fromId int32) error {
+func (p *Host) SendVictory() error {
 	for id, ip := range p.IdMap {
 		log.Printf("SendVictory- connecting ip: %v", ip)
 		host := Hosts.GetHostById(id)
@@ -107,6 +107,8 @@ func (p *Host) SendVictory(fromId int32) error {
 		// 发送消息
 		host.AcceptVictory(p.Id)
 	}
+
+	p.MasterId = p.Id
 
 	return nil
 }
